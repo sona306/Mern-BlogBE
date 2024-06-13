@@ -2,6 +2,7 @@ const express  = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
 const bcrypt = require("bcryptjs")
+const jwt = require("jsonwebtoken")
 
 const {blogmodel}=require("./models/blog")
 
@@ -38,7 +39,16 @@ app.post("/signin",(req,res)=>{
                 bcrypt.compare(input.password,dbPassword,(error,isMatch)=>{
                     if (isMatch) 
                     {
-                        res.json({"status":"success","userID":response[0]._id})
+                        jwt.sign({email:input.emailid},"blog-app",{expiresIn:"1d"},
+                        (error,token)=>{
+                            if (error) 
+                            {
+                                res.json({"status":"unable to create token"})
+                            } else 
+                            {
+                                res.json({"status":"success","userID":response[0]._id,"token":token})
+                            }
+                        })
                     } else 
                     {
                         res.json({"status":"incorrect"})
