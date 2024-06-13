@@ -27,6 +27,31 @@ app.post("/signup",async (req,res)=>{
     res.json({"status":"success"})
 })
 
+app.post("/signin",(req,res)=>{
+    let input = req.body
+    blogmodel.find({"emailid":req.body.emailid}).then(
+
+        (response)=>{
+            if (response.length>0) 
+            {
+                let dbPassword = response[0].password
+                bcrypt.compare(input.password,dbPassword,(error,isMatch)=>{
+                    if (isMatch) 
+                    {
+                        res.json({"status":"success","userID":response[0]._id})
+                    } else 
+                    {
+                        res.json({"status":"incorrect"})
+                    }
+                })
+            } else 
+            {
+                res.json({"status":"user not found"})
+            }
+        }
+
+    ).catch()
+} )
 app.listen(8088,()=>{
     console.log("server running..")
     })
